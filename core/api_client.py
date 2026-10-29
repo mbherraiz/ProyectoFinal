@@ -98,6 +98,46 @@ def fetch_owned_games(steamid_input: Any, api_key: str, timeout: float = 12.0) -
     return unified_games
 
 
+_achievements_cache: Dict[int, Optional[Dict[str, int]]] = {}
+
+
+def get_game_achievements(steamid: str, appid: int, api_key: str, timeout: float = 6.0) -> Optional[Dict[str, int]]:
+    """
+    Obtiene los logros obtenidos y totales para un juego específico mediante ISteamUserStats/GetPlayerAchievements.
+    Retorna {'unlocked': X, 'total': Y} o None si no tiene logros o falla la consulta.
+    """
+    if not steamid or not api_key:
+        return None
+
+    if appid in _achievements_cache:
+        return _achievements_cache[appid]
+
+    endpoint = f"{STEAM_API_BASE_URL}/ISteamUserStats/GetPlayerAchievements/v0001/"
+    params = {
+        "key": api_key,
+        "steamid": steamid,
+        "appid": appid,
+        "l": "spanish"
+    }
+
+    try:
+        response = requests.get(endpoint, params=params, timeout=timeout)
+        if response.status_code == 200:
+            data = response.json()
+            playerstats = data.get("playerstats", {})
+            if playerstats.get("success"):
+                achievements = playerstats.get("achievements", [])
+                total = len(achievements)
+                unlocked = sum(1 for a in achievements if a.get("achieved") == 1)
+                res = {"unlocked": unlocked, "total": total}
+                _achievements_cache[appid] = res
+                return res
+        _achievements_cache[appid] = None
+        return None
+    except Exception:
+        return None
+
+
 def get_cached_cover_path(appid: int) -> Optional[Path]:
     """Retorna la ruta a la carátula si ya está descargada en el caché local."""
     path = COVERS_DIR / f"{appid}.jpg"

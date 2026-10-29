@@ -4,6 +4,7 @@ Inicializa el sistema de trazabilidad de errores, la base de datos local SQLite,
 los manejadores globales de excepciones y arranca el loop de CustomTkinter.
 """
 
+import os
 import sys
 from config import LOG_FILE
 import database
@@ -16,7 +17,22 @@ from logger import (
 from ui.main_window import MainWindow
 
 
+def _hide_console_window() -> None:
+    """Oculta la ventana de consola de comandos en Windows si se inició mediante python.exe."""
+    if sys.platform == "win32":
+        try:
+            import ctypes
+            hwnd = ctypes.windll.kernel32.GetConsoleWindow()
+            if hwnd:
+                # 0 = SW_HIDE
+                ctypes.windll.user32.ShowWindow(hwnd, 0)
+        except Exception:
+            pass
+
+
 def main() -> None:
+    _hide_console_window()
+
     # 1. Configuración del sistema de logging centralizado (app_crash.log)
     setup_logging()
     logger = get_logger("Main")

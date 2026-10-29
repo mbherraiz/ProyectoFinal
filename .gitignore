@@ -1,0 +1,36 @@
+# Entorno virtual y Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Base de datos local y caché de Steam Light Launcher
+steam_launcher.db
+steam_launcher.db-journal
+cache/
+covers/
+
+# Registros y Logs de errores
+*.log
+app_crash.log
+
+# Respaldos de configuración de Steam
+*.bak
+config.vdf.bak
+
+# IDEs y editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Sistema operativo
+Thumbs.db
+Desktop.ini
+.DS_Store

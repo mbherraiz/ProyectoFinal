@@ -18,23 +18,52 @@ from logger import get_logger
 logger = get_logger("ProcessManager")
 
 
+_steam_pids_cache: set = set()
+_last_pid_scan_time: float = 0.0
+
+
+def _refresh_steam_pids_if_needed(force: bool = False) -> set:
+    global _steam_pids_cache, _last_pid_scan_time
+    now = time.time()
+    if force or not _steam_pids_cache or (now - _last_pid_scan_time > 10.0):
+        steam_names = {"steam.exe", "steamwebhelper.exe"}
+        found_pids = set()
+        for proc in psutil.process_iter(["name", "pid"]):
+            try:
+                name = proc.info.get("name")
+                if name and name.lower() in steam_names:
+                    found_pids.add(proc.info.get("pid"))
+            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                continue
+        _steam_pids_cache = found_pids
+        _last_pid_scan_time = now
+    return _steam_pids_cache
+
+
 def is_steam_running() -> bool:
     """Verifica si steam.exe se encuentra actualmente en ejecución."""
-    for proc in psutil.process_iter(["name"]):
+    pids = _refresh_steam_pids_if_needed()
+    if not pids:
+        # Reintentar forzado por si acaba de abrir
+        pids = _refresh_steam_pids_if_needed(force=True)
+    for pid in list(pids):
         try:
-            if proc.info["name"] and proc.info["name"].lower() == "steam.exe":
+            p = psutil.Process(pid)
+            if p.is_running() and p.name().lower() == "steam.exe":
                 return True
         except (psutil.NoSuchProcess, psutil.AccessDenied):
-            continue
+            _steam_pids_cache.discard(pid)
     return False
 
 
 def get_steam_process() -> Optional[psutil.Process]:
     """Retorna la instancia psutil.Process del ejecutable principal de Steam si existe."""
-    for proc in psutil.process_iter(["name"]):
+    pids = _refresh_steam_pids_if_needed(force=True)
+    for pid in pids:
         try:
-            if proc.info["name"] and proc.info["name"].lower() == "steam.exe":
-                return proc
+            p = psutil.Process(pid)
+            if p.is_running() and p.name().lower() == "steam.exe":
+                return p
         except (psutil.NoSuchProcess, psutil.AccessDenied):
             continue
     return None
@@ -43,16 +72,14 @@ def get_steam_process() -> Optional[psutil.Process]:
 def get_steam_memory_usage_mb() -> float:
     """Calcula el consumo total de memoria RAM (en MB) de todos los procesos asociados a Steam."""
     total_bytes = 0
-    steam_names = {"steam.exe", "steamwebhelper.exe", "steamservice.exe"}
-    for proc in psutil.process_iter(["name", "memory_info"]):
+    pids = list(_refresh_steam_pids_if_needed())
+    for pid in pids:
         try:
-            name = proc.info.get("name")
-            if name and name.lower() in steam_names:
-                mem = proc.info.get("memory_info")
-                if mem:
-                    total_bytes += mem.rss
+            p = psutil.Process(pid)
+            if p.is_running():
+                total_bytes += p.memory_info().rss
         except (psutil.NoSuchProcess, psutil.AccessDenied):
-            continue
+            _steam_pids_cache.discard(pid)
     return round(total_bytes / (1024 * 1024), 1)
 
 

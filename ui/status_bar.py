@@ -40,7 +40,7 @@ class StatusBar(ctk.CTkFrame):
             border_color=COLOR_BORDER,
             border_width=1,
             corner_radius=0,
-            height=46,
+            height=50,
             **kwargs
         )
         self.pack_propagate(False)
@@ -52,12 +52,12 @@ class StatusBar(ctk.CTkFrame):
         """Construye la disposición de la barra de estado."""
         # ----------------- SECCIÓN IZQUIERDA: Presencia de Steam -----------------
         left_frame = ctk.CTkFrame(self, fg_color="transparent")
-        left_frame.pack(side="left", padx=12, fill="y")
+        left_frame.pack(side="left", padx=14, fill="y")
 
         lbl_presencia = ctk.CTkLabel(
             left_frame,
             text="Presencia:",
-            font=ctk.CTkFont(size=11, weight="bold"),
+            font=ctk.CTkFont(size=12, weight="bold"),
             text_color=COLOR_TEXT_SECONDARY
         )
         lbl_presencia.pack(side="left", padx=(0, 8))
@@ -68,41 +68,25 @@ class StatusBar(ctk.CTkFrame):
         self.btn_invisible = self._create_presence_btn(left_frame, "Invisible", "invisible", COLOR_STATUS_INVISIBLE)
         self.btn_offline = self._create_presence_btn(left_frame, "Desconectado", "offline", COLOR_STATUS_OFFLINE)
 
-        # Accesos rápidos a Amigos y Chat
-        sep_1 = ctk.CTkFrame(left_frame, width=1, height=18, fg_color=COLOR_BORDER)
+        # Acceso rápido a Amigos
+        sep_1 = ctk.CTkFrame(left_frame, width=1, height=20, fg_color=COLOR_BORDER)
         sep_1.pack(side="left", padx=8)
 
         btn_friends = ctk.CTkButton(
             left_frame,
             text="Amigos",
-            font=ctk.CTkFont(size=10),
+            font=ctk.CTkFont(size=11, weight="bold"),
             fg_color=COLOR_BTN_SECONDARY,
             hover_color=COLOR_BTN_SECONDARY_HOVER,
             text_color=COLOR_TEXT_SECONDARY,
             border_color=COLOR_BORDER,
             border_width=1,
-            corner_radius=4,
-            height=24,
-            width=58,
+            corner_radius=6,
+            height=28,
+            width=70,
             command=presence_manager.open_friends_list
         )
-        btn_friends.pack(side="left", padx=2)
-
-        btn_chat = ctk.CTkButton(
-            left_frame,
-            text="Chat",
-            font=ctk.CTkFont(size=10),
-            fg_color=COLOR_BTN_SECONDARY,
-            hover_color=COLOR_BTN_SECONDARY_HOVER,
-            text_color=COLOR_TEXT_SECONDARY,
-            border_color=COLOR_BORDER,
-            border_width=1,
-            corner_radius=4,
-            height=24,
-            width=48,
-            command=presence_manager.open_chat_window
-        )
-        btn_chat.pack(side="left", padx=2)
+        btn_friends.pack(side="left", padx=3)
 
         # ----------------- SECCIÓN CENTRAL: Descargas en Curso -----------------
         self.download_frame = ctk.CTkFrame(self, fg_color="transparent")
@@ -111,7 +95,7 @@ class StatusBar(ctk.CTkFrame):
         self.lbl_download_title = ctk.CTkLabel(
             self.download_frame,
             text="",
-            font=ctk.CTkFont(size=10),
+            font=ctk.CTkFont(size=11, weight="bold"),
             text_color=COLOR_TEXT_SECONDARY,
             anchor="w"
         )
@@ -119,34 +103,33 @@ class StatusBar(ctk.CTkFrame):
 
         self.progress_bar = ctk.CTkProgressBar(
             self.download_frame,
-            width=140,
-            height=8,
+            width=160,
+            height=10,
             fg_color="#181818",
             progress_color="#e0e0e0",
             border_color=COLOR_BORDER,
             border_width=1,
-            corner_radius=3
+            corner_radius=4
         )
         self.progress_bar.set(0)
-        # Oculto por defecto hasta que haya descarga
         self.progress_bar.pack_forget()
 
         self.lbl_download_meta = ctk.CTkLabel(
             self.download_frame,
             text="",
-            font=ctk.CTkFont(size=10),
+            font=ctk.CTkFont(size=11),
             text_color=COLOR_TEXT_MUTED
         )
         self.lbl_download_meta.pack(side="left", padx=8)
 
         # ----------------- SECCIÓN DERECHA: Telemetría de Steam -----------------
         right_frame = ctk.CTkFrame(self, fg_color="transparent")
-        right_frame.pack(side="right", padx=12, fill="y")
+        right_frame.pack(side="right", padx=14, fill="y")
 
         self.lbl_steam_ram = ctk.CTkLabel(
             right_frame,
             text="Steam: Comprobando...",
-            font=ctk.CTkFont(size=11),
+            font=ctk.CTkFont(size=12, weight="bold"),
             text_color=COLOR_TEXT_MUTED
         )
         self.lbl_steam_ram.pack(side="right", padx=4)
@@ -156,18 +139,18 @@ class StatusBar(ctk.CTkFrame):
         btn = ctk.CTkButton(
             parent,
             text=f"● {text}",
-            font=ctk.CTkFont(size=10, weight="bold"),
+            font=ctk.CTkFont(size=11, weight="bold"),
             fg_color=COLOR_BTN_SECONDARY,
             hover_color=COLOR_BTN_SECONDARY_HOVER,
             text_color=dot_color,
             border_color=COLOR_BORDER,
             border_width=1,
-            corner_radius=4,
-            height=24,
-            width=75,
-            command=lambda k=key: self._on_presence_selected(k)
+            corner_radius=6,
+            height=28,
+            width=90,
+            command=lambda k=key: self.set_presence(k)
         )
-        btn.pack(side="left", padx=2)
+        btn.pack(side="left", padx=3)
         return btn
 
     def _on_presence_selected(self, key: str) -> None:

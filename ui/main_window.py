@@ -114,33 +114,17 @@ class MainWindow(ctk.CTk):
         header_frame.pack(fill="x", side="top")
         header_frame.pack_propagate(False)
 
-        # Logotipo y título
+        # Título principal
         title_box = ctk.CTkFrame(header_frame, fg_color="transparent")
-        title_box.pack(side="left", padx=20)
-
-        lbl_logo = ctk.CTkLabel(
-            title_box,
-            text="[S]",
-            font=ctk.CTkFont(family="Consolas", size=20, weight="bold"),
-            text_color=COLOR_TEXT_PRIMARY
-        )
-        lbl_logo.pack(side="left", padx=(0, 8))
+        title_box.pack(side="left", padx=24)
 
         lbl_title = ctk.CTkLabel(
             title_box,
             text="STEAM LIGHT LAUNCHER",
-            font=ctk.CTkFont(size=15, weight="bold"),
+            font=ctk.CTkFont(size=18, weight="bold"),
             text_color=COLOR_TEXT_PRIMARY
         )
         lbl_title.pack(side="left")
-
-        lbl_badge = ctk.CTkLabel(
-            title_box,
-            text="• ULTRA-LIGHT MODE",
-            font=ctk.CTkFont(size=10, weight="bold"),
-            text_color=COLOR_TEXT_MUTED
-        )
-        lbl_badge.pack(side="left", padx=(10, 0))
 
         # Controles de la cabecera derecha
         ctrl_box = ctk.CTkFrame(header_frame, fg_color="transparent")
@@ -150,34 +134,34 @@ class MainWindow(ctk.CTk):
         self.btn_steam_toggle = ctk.CTkButton(
             ctrl_box,
             text="Lanzar Steam Ligero",
-            font=ctk.CTkFont(size=11, weight="bold"),
+            font=ctk.CTkFont(size=13, weight="bold"),
             fg_color=COLOR_BTN_PRIMARY,
             hover_color=COLOR_BTN_PRIMARY_HOVER,
             text_color=COLOR_TEXT_PRIMARY,
             border_color=COLOR_BORDER,
             border_width=1,
-            corner_radius=6,
-            height=30,
+            corner_radius=8,
+            height=36,
             command=self._launch_or_restart_steam
         )
-        self.btn_steam_toggle.pack(side="left", padx=6)
+        self.btn_steam_toggle.pack(side="left", padx=8)
 
         # Botón de Ajustes
         btn_settings = ctk.CTkButton(
             ctrl_box,
             text="Ajustes",
-            font=ctk.CTkFont(size=11),
+            font=ctk.CTkFont(size=13, weight="bold"),
             fg_color=COLOR_BTN_SECONDARY,
             hover_color=COLOR_BTN_SECONDARY_HOVER,
             text_color=COLOR_TEXT_SECONDARY,
             border_color=COLOR_BORDER,
             border_width=1,
-            corner_radius=6,
-            height=30,
-            width=75,
+            corner_radius=8,
+            height=36,
+            width=90,
             command=self._open_settings_dialog
         )
-        btn_settings.pack(side="left", padx=6)
+        btn_settings.pack(side="left", padx=8)
 
     def _build_tabs(self) -> None:
         """Construye las pestañas centrales de navegación."""
@@ -223,7 +207,8 @@ class MainWindow(ctk.CTk):
         """Inicializa el monitor de descargas de Steam en segundo plano."""
         self.tracker = download_tracker.DownloadTracker(
             steam_path=self.steam_path,
-            callback=lambda info: dispatch_to_main(lambda: self.status_bar.update_download_status(info.to_dict()))
+            callback=lambda info: dispatch_to_main(lambda: self.status_bar.update_download_status(info.to_dict())),
+            poll_interval=3.5
         )
         self.tracker.start()
 
@@ -245,7 +230,7 @@ class MainWindow(ctk.CTk):
                 except Exception as e:
                     logger.debug(f"Error en ciclo de telemetría: {e}")
 
-                time.sleep(2.5)
+                time.sleep(5.0)
 
         threading.Thread(target=_telemetry_worker, name="TelemetryWorker", daemon=True).start()
 

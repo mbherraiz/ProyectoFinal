@@ -74,9 +74,13 @@ STEAM_URI_STATUS_OFFLINE = "steam://friends/status/offline"
 STEAM_URI_FRIENDS = "steam://friends/"
 STEAM_URI_CHAT = "steam://friends/players"
 
+# Dimensiones de las carátulas (ratio 460x215)
+CARD_IMG_WIDTH = 260
+CARD_IMG_HEIGHT = 122
+
 # Dimensiones de la ventana
 WINDOW_TITLE = "Steam Light Launcher"
-WINDOW_MIN_WIDTH = 960
-WINDOW_MIN_HEIGHT = 680
-DEFAULT_WIDTH = 1100
-DEFAULT_HEIGHT = 740
+WINDOW_MIN_WIDTH = 1000
+WINDOW_MIN_HEIGHT = 700
+DEFAULT_WIDTH = 1180
+DEFAULT_HEIGHT = 780

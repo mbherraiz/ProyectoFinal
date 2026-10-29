@@ -31,7 +31,7 @@ def dispatch_to_main(task: Callable[[], Any]) -> None:
     _task_queue.put(task)
 
 
-def init_dispatcher(root_widget, poll_interval_ms: int = 25) -> None:
+def init_dispatcher(root_widget, poll_interval_ms: int = 60) -> None:
     """
     Inicia el bucle de consumo de la cola en el hilo principal de la ventana.
     Debe llamarse desde el __init__ de MainWindow.
